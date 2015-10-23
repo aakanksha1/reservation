@@ -1,0 +1,66 @@
+{% extends "base_site.html" %}
+{% block title %} {{restaurant.name}} {% endblock %}
+{% block content %}
+<h1>{{restaurant.name}}</h1>
+<h2>{{restaurant.address}}</h2>
+<form action = "{% url 'eatsat:update_wait_time' restaurant.name restaurant.address %}" method = "post">
+	{% csrf_token %}
+	Current estimated wait time is {{restaurant.estimated_wait_time}} minutes
+	<br>
+	<input type= "number" name = "new_wait_time" id="new_wait_time">
+	<input type= "submit" value = "Update estimated wait time">
+</form>
+<br>
+<form action = "{% url 'eatsat:new_eatsat' restaurant.name restaurant.address %}" method = "post">
+	{% csrf_token %}
+	Account:
+	<br>
+	<select name = "account_id">
+		{% for account in accounts %}
+		<option value = "{{account.account_id}}"> {{account.last_name}} </option>
+		{% endfor %}
+	</select>
+	<br>
+	Enter party size:
+	<br>
+	<input type = 'number' name = "party_size">
+	<br>
+	<script type="text/javascript" charset="utf-8">
+		function hide_reservation() {
+			document.getElementById('reservation_time_div').setAttribute('hidden', true);
+			document.getElementById('reservation_time').removeAttribute('required');
+			return false;
+		}
+
+		function show_reservation() {
+			document.getElementById('reservation_time_div').removeAttribute('hidden');
+			document.getElementById('reservation_time').setAttribute('required', true);
+			return false;
+		}
+	</script>
+	<input type = "radio" value = "walkin" name = "eatsat_type" checked onclick = "hide_reservation()">
+	Walk In
+	<input type = "radio" value = "reservation" name = "eatsat_type" onclick = "show_reservation()">
+	Reservation
+	<div id = "reservation_time_div" hidden>
+		<input type = "datetime-local" name = "reservation_time" id = "reservation_time">
+	</div>
+	<br>
+	<input type = "submit" value = "Add scheduled meal">
+</form>
+{% if eatsat_list %}
+<h2>Scheduled Meals</h2>
+<ul>
+	{% for eatsat in eatsat_list %}
+	<li>
+		{{eatsat.account.last_name}}, party of {{eatsat.party_size}}
+		(<a href = "{% url 'eatsat:cancel_eatsat' restaurant.name restaurant.address eatsat.account.account_id %}">cancel</a>)
+	</li>
+	{% endfor %}
+</ul>
+{% else %}
+<p>
+	No meals currently scheduled
+</p>
+{% endif %}
+{% endblock %}

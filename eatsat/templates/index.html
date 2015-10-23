@@ -1,0 +1,18 @@
+{% extends "base_site.html" %}
+{% block title %} Restaurants {% endblock %}
+{% block content %}
+{% if restaurant_List %}
+<h1>Select a restauraunt</h1>
+<ul>
+	{% for restaurant in restaurant_List %}
+	<li>
+		<a href="{% url 'eatsat:restaurant' restaurant.name restaurant.address %}"> {{restaurant.name}}</a>
+	</li>
+	{% endfor %}
+</ul>
+{% else %}
+<p>
+	No restaurants available
+</p>
+{% endif %}
+{% endblock %}
